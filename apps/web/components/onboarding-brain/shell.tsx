@@ -46,8 +46,12 @@ export function BrainShell({ step, steps, children }: ShellProps) {
 				}}
 			/>
 
-			<header className="pointer-events-none absolute inset-x-0 top-0 z-20 px-4 py-4 md:px-10">
+			<header className="pointer-events-none absolute inset-x-0 top-0 z-20 grid grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 py-4 md:px-10">
 				<LogoFull className="h-5 text-[#fafafa] md:h-6" />
+				<div className="hidden justify-center md:flex">
+					<StepIndicator step={step} visibleSteps={visibleSteps} />
+				</div>
+				<span aria-hidden />
 			</header>
 
 			<main
@@ -58,7 +62,7 @@ export function BrainShell({ step, steps, children }: ShellProps) {
 						: "justify-center overflow-y-auto py-20 md:overflow-hidden",
 				)}
 			>
-				<div className="mb-5 flex justify-center">
+				<div className="mb-5 flex justify-center md:hidden">
 					<StepIndicator step={step} visibleSteps={visibleSteps} />
 				</div>
 				<div
