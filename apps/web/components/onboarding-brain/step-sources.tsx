@@ -943,7 +943,6 @@ function SourceActions({
 			<Button
 				variant="insideOut"
 				onClick={onContinue}
-				disabled={connectedCount === 0}
 				className="rounded-full px-4 py-2 text-[13px] font-medium text-[#fafafa] md:px-5 md:py-[10px]"
 			>
 				Continue
