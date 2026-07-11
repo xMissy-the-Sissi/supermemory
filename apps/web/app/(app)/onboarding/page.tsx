@@ -86,9 +86,12 @@ export default function BrainOnboardingPage() {
 		() => workspaceDomainFromEmail(user?.email),
 		[user?.email],
 	)
-
-	// Team (Company Brain) onboarding is gated behind a private-beta flag.
-	const allowTeam = useFeatureFlagEnabled("company-brain-beta") ?? false
+	// Team (Company Brain) onboarding is gated behind a private-beta flag in production,
+	// but local dev needs the stepped flow available for responsive QA.
+	const companyBrainFlagEnabled =
+		useFeatureFlagEnabled("company-brain-beta") ?? false
+	const localCompanyBrainPreview = process.env.NODE_ENV === "development"
+	const allowTeam = companyBrainFlagEnabled || localCompanyBrainPreview
 	const [mode, setMode] = useState<BrainMode>(detectedMode)
 	const [about, setAbout] = useState<AboutValues>({
 		name: user?.name ?? "",
@@ -339,9 +342,10 @@ export default function BrainOnboardingPage() {
 			setCreatingOrg(false)
 		}
 	}, [ensureOrg, goNext, forceCreate, organizations, router])
-
-	// Company Brain (team) onboarding is a single research surface, no stepper.
-	const isCompanyBrain = allowTeam && mode === "team"
+	// The production Company Brain path uses the research surface; local dev keeps
+	// the stepped flow visible so Tools/Flows/Team can be tested directly.
+	const isCompanyBrain =
+		companyBrainFlagEnabled && mode === "team" && !localCompanyBrainPreview
 
 	const handleBrainConfirm = useCallback(
 		async (confirmedDomain: string): Promise<CompanyBrainConfirmResult> => {
