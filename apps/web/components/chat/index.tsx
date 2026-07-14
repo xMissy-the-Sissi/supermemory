@@ -39,6 +39,7 @@ import { getNovaChatErrorCopy } from "@/lib/chat-stream-error"
 import { useProject } from "@/stores"
 import { useContainerTags } from "@/hooks/use-container-tags"
 import { getChatSpaceDisplayLabel } from "@/lib/chat-space-label"
+import { getBackendUrl } from "@/lib/url-helpers"
 import {
 	getDefaultReasoningEffort,
 	modelNames,
@@ -346,8 +347,7 @@ export function ChatSidebar({
 		(id: string) => setThreadId(id),
 		[setThreadId],
 	)
-	const chatApiBase =
-		process.env.NEXT_PUBLIC_BACKEND_URL ?? "https://api.supermemory.ai"
+	const chatApiBase = getBackendUrl()
 
 	const chatTransport = useMemo(
 		() =>
