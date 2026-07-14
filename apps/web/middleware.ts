@@ -1,8 +1,7 @@
 import { getSessionCookie } from "better-auth/cookies"
 import { NextResponse } from "next/server"
-import { getPublicRequestUrl } from "@/lib/url-helpers"
+import { getPublicRequestUrl, isLocalHostname } from "@/lib/url-helpers"
 
-const LOCAL_DEV_HOSTS = new Set(["localhost", "127.0.0.1", "::1"])
 
 function getAuthSessionCookie(request: Request): string | null {
 	return (
@@ -24,7 +23,7 @@ export default async function proxy(request: Request) {
 	// in production bundles.
 	if (
 		process.env.NODE_ENV === "development" &&
-		LOCAL_DEV_HOSTS.has(url.hostname)
+		isLocalHostname(url.hostname)
 	) {
 		console.debug("[PROXY] Local dev host, allowing access")
 		return NextResponse.next()
