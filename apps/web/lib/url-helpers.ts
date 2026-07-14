@@ -1,13 +1,15 @@
-const PROXY_LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "::1"])
+const PROXY_LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]"])
 const DEFAULT_BACKEND_URL = "https://api.supermemory.ai"
 const DEV_APP_ORIGIN = "https://app.dev.supermemory.ai"
 const PROD_APP_ORIGIN = "https://app.supermemory.ai"
 
 export function getBackendUrl(): string {
-	return (process.env.NEXT_PUBLIC_BACKEND_URL ?? DEFAULT_BACKEND_URL).replace(
-		/\/+$/,
-		"",
-	)
+	const configuredUrl = process.env.NEXT_PUBLIC_BACKEND_URL?.trim()
+	return (configuredUrl || DEFAULT_BACKEND_URL).replace(/\/+$/, "")
+}
+
+export function isLocalHostname(hostname: string): boolean {
+	return PROXY_LOCAL_HOSTS.has(hostname.trim().toLowerCase())
 }
 
 export function getAppOriginForCurrentEnvironment(hostname?: string): string {
@@ -16,7 +18,7 @@ export function getAppOriginForCurrentEnvironment(hostname?: string): string {
 	const normalized = currentHostname.toLowerCase()
 	const isLocalOrDev =
 		process.env.NODE_ENV !== "production" ||
-		PROXY_LOCAL_HOSTS.has(normalized) ||
+		isLocalHostname(normalized) ||
 		normalized.includes("app.dev.supermemory")
 
 	return isLocalOrDev ? DEV_APP_ORIGIN : PROD_APP_ORIGIN
@@ -58,7 +60,7 @@ export function resolveAuthRedirectUrl(
 	if (!redirectUrl) return fallback
 	try {
 		const target = new URL(redirectUrl)
-		if (PROXY_LOCAL_HOSTS.has(target.hostname)) {
+		if (isLocalHostname(target.hostname)) {
 			return new URL(`${target.pathname}${target.search}`, origin)
 		}
 		if (target.origin === origin) return target

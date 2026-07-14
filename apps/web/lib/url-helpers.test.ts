@@ -1,5 +1,55 @@
-import { describe, expect, it } from "bun:test"
-import { isYouTubeUrl } from "./url-helpers"
+import { afterEach, describe, expect, it } from "bun:test"
+import {
+	getBackendUrl,
+	isLocalHostname,
+	isYouTubeUrl,
+	resolveAuthRedirectUrl,
+} from "./url-helpers"
+
+const originalBackendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
+
+afterEach(() => {
+	if (originalBackendUrl === undefined) {
+		delete process.env.NEXT_PUBLIC_BACKEND_URL
+	} else {
+		process.env.NEXT_PUBLIC_BACKEND_URL = originalBackendUrl
+	}
+})
+
+describe("getBackendUrl", () => {
+	it("falls back to the hosted API when the variable is missing", () => {
+		delete process.env.NEXT_PUBLIC_BACKEND_URL
+		expect(getBackendUrl()).toBe("https://api.supermemory.ai")
+	})
+
+	it("uses a configured backend and removes trailing slashes", () => {
+		process.env.NEXT_PUBLIC_BACKEND_URL = "https://backend.example///"
+		expect(getBackendUrl()).toBe("https://backend.example")
+	})
+
+	it("treats empty and whitespace-only values as missing", () => {
+		process.env.NEXT_PUBLIC_BACKEND_URL = "   "
+		expect(getBackendUrl()).toBe("https://api.supermemory.ai")
+	})
+})
+
+describe("local host detection", () => {
+	it("accepts browser-normalized IPv6 loopback hostnames", () => {
+		const hostname = new URL("http://[::1]:3000/").hostname
+		expect(hostname).toBe("[::1]")
+		expect(isLocalHostname(hostname)).toBe(true)
+	})
+
+	it("maps IPv6 loopback auth redirects back to the public origin", () => {
+		const redirected = resolveAuthRedirectUrl(
+			"http://[::1]:3000/settings?tab=profile",
+			"https://local.example",
+		)
+		expect(redirected.toString()).toBe(
+			"https://local.example/settings?tab=profile",
+		)
+	})
+})
 
 describe("isYouTubeUrl", () => {
 	it("matches canonical youtube.com watch URLs", () => {
