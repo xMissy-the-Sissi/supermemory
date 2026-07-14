@@ -2,7 +2,6 @@ import { getSessionCookie } from "better-auth/cookies"
 import { NextResponse } from "next/server"
 import { getPublicRequestUrl, isLocalHostname } from "@/lib/url-helpers"
 
-
 function getAuthSessionCookie(request: Request): string | null {
 	return (
 		getSessionCookie(request) ??
