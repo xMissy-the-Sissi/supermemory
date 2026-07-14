@@ -1,9 +1,4 @@
-const PROXY_LOCAL_HOSTS = new Set([
-	"localhost",
-	"127.0.0.1",
-	"::1",
-	"[::1]",
-])
+const PROXY_LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]"])
 const DEFAULT_BACKEND_URL = "https://api.supermemory.ai"
 const DEV_APP_ORIGIN = "https://app.dev.supermemory.ai"
 const PROD_APP_ORIGIN = "https://app.supermemory.ai"
